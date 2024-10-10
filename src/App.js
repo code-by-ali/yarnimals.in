@@ -1,14 +1,8 @@
 import "./App.css";
-import Header from "./components/Header";
-import ProductList from "./components/ProductList";
+import AppRoutes from "./components/Routes";
 
 function App() {
-	return (
-		<div className="flex flex-col">
-			<Header />
-			<ProductList />
-		</div>
-	);
+	return <AppRoutes />;
 }
 
 export default App;
