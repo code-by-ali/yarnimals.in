@@ -1,31 +1,32 @@
-import React, { useState, useEffect } from "react";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-	Table,
 	Button,
-	Modal,
+	Carousel,
 	Form,
 	Input,
 	InputNumber,
+	Modal,
+	Spin,
 	Upload,
 	message,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
-	collection,
-	getDocs,
 	addDoc,
-	updateDoc,
+	collection,
 	deleteDoc,
 	doc,
+	getDocs,
+	updateDoc,
 } from "firebase/firestore";
 import {
+	deleteObject,
+	getDownloadURL,
 	ref,
 	uploadBytes,
-	getDownloadURL,
-	deleteObject,
 } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";
+import { db, storage } from "../../firebase";
 
 const AdminDashboard = () => {
 	const [products, setProducts] = useState([]);
@@ -142,55 +143,14 @@ const AdminDashboard = () => {
 			setModalVisible(false);
 			fetchProducts();
 		} catch (error) {
-			console.error("Operation failed:", error);
 			message.error("Operation failed");
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const columns = [
-		{ title: "Name", dataIndex: "name", key: "name" },
-		{ title: "Price", dataIndex: "price", key: "price" },
-		{
-			title: "Description",
-			dataIndex: "description",
-			key: "description",
-			ellipsis: true,
-		},
-		{
-			title: "Images",
-			dataIndex: "imagesUrl",
-			key: "imagesUrl",
-			render: (imagesUrl) =>
-				imagesUrl && imagesUrl.length > 0 ? (
-					<img
-						src={imagesUrl[0]}
-						alt="product"
-						style={{ width: 50, height: 50 }}
-					/>
-				) : (
-					"No image"
-				),
-		},
-		{
-			title: "Actions",
-			key: "actions",
-			render: (_, record) => (
-				<>
-					<Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-					<Button
-						icon={<DeleteOutlined />}
-						onClick={() => handleDelete(record.id)}
-						style={{ marginLeft: 8 }}
-					/>
-				</>
-			),
-		},
-	];
-
 	return (
-		<div className="p-5">
+		<div className="p-4">
 			<Button
 				icon={<PlusOutlined />}
 				onClick={handleAdd}
@@ -198,12 +158,67 @@ const AdminDashboard = () => {
 			>
 				Add Product
 			</Button>
-			<Table
-				columns={columns}
-				dataSource={products}
-				loading={loading}
-				rowKey="id"
-			/>
+
+			{loading ? (
+				<div className="w-full h-32 flex justify-center items-center">
+					<Spin />
+				</div>
+			) : (
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{products.map((item) => (
+						<div
+							key={item.id}
+							className="flex flex-row items-start bg-white border border-[#ddd] rounded-lg h-[130px] drop-shadow"
+						>
+							<div className="max-w-[110px]">
+								<Carousel
+									arrows={item.imagesUrl.length > 1}
+									dots={false}
+									infinite={true}
+									draggable={true}
+								>
+									{item.imagesUrl.map((url) => (
+										<div>
+											<img
+												className="object-cover rounded-tl-lg rounded-bl-lg h-[128px] min-w-[110px]"
+												src={url}
+												alt=""
+											/>
+										</div>
+									))}
+								</Carousel>
+							</div>
+							<div className="flex flex-col gap-2 w-full py-1 px-2 h-full">
+								<div className="flex justify-between items-start w-full gap-1">
+									<span className="text-[15px] font-medium tracking-wide text-black truncate flex-1">
+										{item?.name}
+									</span>
+									<p className="text-[15px] font-medium text-black1 whitespace-nowrap">
+										₹{item?.price}
+									</p>
+								</div>
+								<div className="flex items-start gap-2 flex-1">
+									<div className="flex-1 overflow-hidden">
+										<p className="text-sm line-clamp-4">{item?.description}</p>
+									</div>
+									<div className="flex flex-col gap-2 mt-1 h-full pb-1">
+										<Button
+											icon={<EditOutlined />}
+											onClick={() => handleEdit(item)}
+										/>
+										<Button
+											danger
+											icon={<DeleteOutlined />}
+											onClick={() => handleDelete(item.id)}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+
 			<Modal
 				title={editingProduct ? "Edit Product" : "Add Product"}
 				visible={modalVisible}
@@ -223,7 +238,7 @@ const AdminDashboard = () => {
 						label="Description"
 						rules={[{ required: true }]}
 					>
-						<Input.TextArea />
+						<Input.TextArea rows={5} />
 					</Form.Item>
 					<Form.Item label="Images" rules={[{ required: true }]}>
 						<Upload

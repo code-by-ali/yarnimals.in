@@ -11,6 +11,7 @@ import Login from "../Login";
 import ProductList from "../ProductList";
 import Header from "./../Header/index";
 import { PrivateRoute } from "./PrivateRoute";
+import SingleProduct from "../SingleProduct";
 
 function LoginRedirect() {
 	const { user } = useAuth();
@@ -25,6 +26,7 @@ function AppRoutes() {
 				<Header />
 				<Routes>
 					<Route path="/" element={<ProductList />} />
+					<Route path="/product/:id" element={<SingleProduct />} />
 					<Route path="/login" element={<LoginRedirect />} />
 					<Route element={<PrivateRoute />}>
 						<Route path="/admin/home" element={<AdminHome />} />
