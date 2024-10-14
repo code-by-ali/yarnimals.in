@@ -1,5 +1,5 @@
 import { AppstoreFilled } from "@ant-design/icons";
-import { Carousel, Spin } from "antd";
+import { Carousel, message, Spin } from "antd";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -32,16 +32,35 @@ const SingleProduct = () => {
 		fetchProduct();
 	}, [id]);
 
-	const handleWhatsAppShare = () => {
+	const handleShare = async () => {
+		const adminWhatsApp = "+919826038261";
 		if (!product) return;
 
-		const phoneNumber = "+919826038261";
+		const text = `Hi, I'm interested in buying ${product.name}. Price: ₹${product.price}. Please contact me on WhatsApp: https://wa.me/${adminWhatsApp}`;
 		const imageUrl = product.imagesUrl[0];
-		const message = `Hi, I'm interested in buying ${product.name}. Price: ₹${product.price}. Can you provide more details?\n\nProduct Image: ${imageUrl}`;
-		const encodedMessage = encodeURIComponent(message);
-		const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
-		window.open(whatsappUrl, "_blank");
+		if (navigator.share) {
+			try {
+				const response = await fetch(imageUrl);
+				const blob = await response.blob();
+				const file = new File([blob], "product-image.jpg", { type: blob.type });
+
+				await navigator.share({
+					title: product.name,
+					text: text,
+					files: [file],
+				});
+			} catch (error) {
+				console.error("Error sharing:", error);
+				message.error("Failed to share. Please try again.");
+			}
+		} else {
+			// Fallback for browsers that don't support Web Share API
+			const whatsappUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(
+				text + "\n\nProduct Image: " + imageUrl,
+			)}`;
+			window.open(whatsappUrl, "_blank");
+		}
 	};
 
 	if (loading)
@@ -127,7 +146,7 @@ const SingleProduct = () => {
 						</p>
 					</div>
 					<button
-						onClick={handleWhatsAppShare}
+						onClick={handleShare}
 						className="w-full mt-8 rounded-lg py-2.5 px-6 uppercase bg-blue1 text-center font-semibold text-white text-base transition-colors duration-300 hover:bg-blue-700"
 					>
 						DM Yarnimals.in to buy
