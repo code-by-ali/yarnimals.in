@@ -32,6 +32,17 @@ const SingleProduct = () => {
 		fetchProduct();
 	}, [id]);
 
+	const handleWhatsAppShare = () => {
+		if (!product) return;
+
+		const phoneNumber = "9977158495"; // Replace with the admin's phone number
+		const message = `Hi, I'm interested in buying ${product.name}. Price: ₹${product.price}. Can you provide more details?`;
+		const encodedMessage = encodeURIComponent(message);
+		const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+		window.open(whatsappUrl, "_blank");
+	};
+
 	if (loading)
 		return (
 			<div className="w-full h-32 flex justify-center items-center">
@@ -114,7 +125,10 @@ const SingleProduct = () => {
 							{product.description}
 						</p>
 					</div>
-					<button className="w-full mt-8 rounded-lg py-2.5 px-6 uppercase bg-blue1 text-center font-semibold text-white text-base transition-colors duration-300 hover:bg-blue-700">
+					<button
+						onClick={handleWhatsAppShare}
+						className="w-full mt-8 rounded-lg py-2.5 px-6 uppercase bg-blue1 text-center font-semibold text-white text-base transition-colors duration-300 hover:bg-blue-700"
+					>
 						DM Yarnimals.in to buy
 					</button>
 				</div>
