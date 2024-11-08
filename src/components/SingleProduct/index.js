@@ -35,7 +35,7 @@ const SingleProduct = () => {
 	const handleWhatsAppShare = () => {
 		if (!product) return;
 
-		const phoneNumber = "+919977158495"; // Replace with the admin's phone number
+		const phoneNumber = "+918962117752"; // Replace with the admin's phone number
 		const message = `Hi, I'm interested in buying ${product.name}. Price: ₹${product.price}. Can you provide more details?`;
 		const encodedMessage = encodeURIComponent(message);
 		const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;

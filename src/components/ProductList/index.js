@@ -39,7 +39,7 @@ const ProductList = () => {
 				<div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 w-full">
 					{products.map((item) => (
 						<div
-							className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow"
+							className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow cursor-pointer"
 							onClick={() => navigate(`/product/${item.id}`)}
 						>
 							<div className="p-2">
